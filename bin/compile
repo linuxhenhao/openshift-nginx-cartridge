@@ -77,7 +77,7 @@ else
 fi
 
 cd $src_dir/nginx-$nginx_ver/
-./configure --with-pcre=$src_dir/pcre-$pcre_ver/ --with-http_ssl_module --add-module=$src_dir/ngx_http_google_filter_module --add-module=$src_dir/ngx_http_google_filter_module
+./configure --with-pcre=$src_dir/pcre-$pcre_ver/ --with-http_ssl_module --add-module=$src_dir/ngx_http_substitutions_filter_module-0.2.0 --add-module=$src_dir/ngx_http_google_filter_module
 make
 cp -f objs/nginx $bin_dir
 make clean

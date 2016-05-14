@@ -9,14 +9,18 @@ bin_dir=$(cd "$1/out" && pwd)
 src_dir=$(cd "$1/src" && pwd)
 buildpack=$(dirname $(dirname $0))
 
-pcre_ver=${PCRE_VERSION:-8.33}
+pcre_ver=${PCRE_VERSION:-8.38}
 pcre_file=${PCRE_FILE:-pcre-$pcre_ver.tar.gz}
 pcre_url=${PCRE_URL:-http://sourceforge.net/projects/pcre/files/pcre/$pcre_ver/$pcre_file}
 
-nginx_ver=${NGINX_VERSION:-1.4.4}
+nginx_ver=${NGINX_VERSION:-1.9.12}
 nginx_file=${NGINX_FILE:-nginx-$nginx_ver.tar.gz}
 nginx_url=${NGINX_URL:-http://nginx.org/download/$nginx_file}
 
+module_subs_file=${MODULE_SUBS_FILE:-v0.6.4.tar.gz}
+module_subs=${MOUDLE_SUBS:-https://github.com/yaoweibin/ngx_http_substitutions_filter_module/archive/v0.6.4.tar.gz}
+module_google_file=${MODULE_GOOGLE_FILE:-0.2.0.tar.gz}
+module_google=${MODULE_GOOGLE:-https://github.com/cuber/ngx_http_google_filter_module/archive/0.2.0.tar.gz}
 
 if test -d $src_dir/pcre-$pcre_ver
 then
@@ -46,9 +50,34 @@ else
     echo " done"
 fi
 
+if test -f $src_dir/$module_subs_file
+then
+    echo "-----> Using subsitution module $module_subs_file"
+else
+    cd $src_dir
+    echo    "       First download, may take several minutes"
+    echo -n "-----> Installing subsitution module $module_subs_file..."
+    curl -sOL $module_subs
+    tar zxf $module_subs_file
+    rm -f $module_subs_file
+    echo " done"
+fi
+
+if test -f $src_dir/$module_google_file
+then
+    echo "-----> Using subsitution module $module_google_file"
+else
+    cd $src_dir
+    echo    "       First download, may take several minutes"
+    echo -n "-----> Installing subsitution module $module_google_file..."
+    curl -sOL $module_google
+    tar zxf $module_google_file
+    rm -f $module_google_file
+    echo " done"
+fi
 
 cd $src_dir/nginx-$nginx_ver/
-./configure --with-pcre=$src_dir/pcre-$pcre_ver/ --with-http_ssl_module
+./configure --with-pcre=$src_dir/pcre-$pcre_ver/ --with-http_ssl_module --add-module=$src_dir/ngx_http_google_filter_module --add-module=$src_dir/ngx_http_google_filter_module
 make
 cp -f objs/nginx $bin_dir
 make clean
